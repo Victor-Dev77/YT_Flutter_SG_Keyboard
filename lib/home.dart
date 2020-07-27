@@ -9,11 +9,12 @@ class _HomeState extends State<Home> {
   static const N = 10;
   static const PASSWORD_LENGHT = 6;
 
-  static var _numbers = Iterable<int>.generate(N).toList()
-    ..shuffle(); // shuffle retourne void donc .. si inline
+  // shuffle retourne void donc .. si inline
+  static var _numbers = Iterable<int>.generate(N).toList()..shuffle();
   String _password = "";
   int _passwordLenght = 0;
-
+  bool _overlayTouch = false;
+  int _indexLongPressed = -1;
   bool get isValid => _passwordLenght == PASSWORD_LENGHT;
   bool get showBtnDelete => _passwordLenght > 0;
 
@@ -47,25 +48,23 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               SizedBox(width: 20),
               Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(PASSWORD_LENGHT, (index) {
-              return Container(
-                width: 15,
-                height: 15,
-                margin: EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: (index < _passwordLenght)
-                        ? Colors.grey
-                        : Colors.grey[350]),
-              );
-            }),
-          ),
-
-          _buildIconDelete(showBtnDelete),
-      
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(PASSWORD_LENGHT, (index) {
+                  return Container(
+                    width: 15,
+                    height: 15,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: (index < _passwordLenght)
+                            ? Colors.grey
+                            : Colors.grey[350]),
+                  );
+                }),
+              ),
+              _buildIconDelete(showBtnDelete),
             ],
-          )
+          ),
         )
       ],
     );
@@ -84,10 +83,17 @@ class _HomeState extends State<Home> {
   Widget _buildKeyBoard(bool isValidPassword) {
     List<Widget> _touchKeyboard = List.generate(N, (index) {
       return InkWell(
+        highlightColor: Colors.transparent,
         onTap: !isValidPassword ? () => _addNumber(_numbers[index]) : null,
+        onHighlightChanged: (value) => setState(() {
+          _overlayTouch = value;
+          _indexLongPressed = index;
+        }),
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: (_overlayTouch && _indexLongPressed == index)
+                  ? Colors.grey[350]
+                  : Colors.grey[200],
               borderRadius: BorderRadius.circular(7),
               border: Border.all(color: Colors.grey[400])),
           child: Center(
@@ -117,28 +123,30 @@ class _HomeState extends State<Home> {
 
   Widget _buildBtnValid(bool isValidBtn) {
     return GestureDetector(
-        onTap: isValidBtn ? () => print("this is the password: $_password") : null,
-        child: Opacity(
-          opacity: isValidBtn ? 1.0 : 0.5,
-          child: Container(
-            height: 75,
-            width: MediaQuery.of(context).size.width * .6,
-            decoration: BoxDecoration(
-              color: Colors.redAccent,
-              borderRadius: BorderRadius.circular(64),
-            ),
-            child: Center(
-              child: Text(
-                "Valider",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
+      onTap:
+          isValidBtn ? () => print("this is the password: $_password") : null,
+      child: Opacity(
+        opacity: isValidBtn ? 1.0 : 0.5,
+        child: Container(
+          height: 60,
+          width: MediaQuery.of(context).size.width * .6,
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: BorderRadius.circular(64),
+          ),
+          child: Center(
+            child: Text(
+              "Valider",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   _addNumber(int number) {
