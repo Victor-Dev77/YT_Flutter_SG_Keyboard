@@ -1,6 +1,6 @@
 # YT - Flutter SG Keyboard
 
-Youtube - Tuto Flutter Clavier Mot de passe de l'application Société Générale
+CodeTaVie sur Youtube - Tuto Flutter Clavier Mot de passe de l'application Société Générale
 
 ## Getting Started
 
